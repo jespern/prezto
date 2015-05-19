@@ -1,0 +1,122 @@
+#
+# A single line theme with Git information on the left and Ruby on the right.
+#
+# Authors:
+#   Steve Losh <steve@stevelosh.com>
+#   Bart Trojanowski <bart@jukie.net>
+#   Brian Carper <brian@carper.ca>
+#   steeef <steeef@gmail.com>
+#   Sorin Ionescu <sorin.ionescu@gmail.com>
+#   Yan Pritzker <yan@pritzker.ws>
+#   Jesper Noehr <jesper@noehr.org>
+#
+# Screenshots:
+#   http://i.imgur.com/gLgVp6Y.png
+#
+
+# Use extended color pallete if available.
+if [[ $TERM = *256color* || $TERM = *rxvt* ]]; then
+  _prompt_jespern_colors=(
+    "%F{81}"  # Turquoise
+    "%F{166}" # Orange
+    "%F{135}" # Purple
+    "%F{161}" # Hotpink
+    "%F{118}" # Limegreen
+    "%F{12}"  # Lightblue
+  )
+else
+  _prompt_jespern_colors=(
+    "%F{cyan}"
+    "%F{yellow}"
+    "%F{magenta}"
+    "%F{red}"
+    "%F{green}"
+    "%F{blue}"
+  )
+fi
+
+# Show remote ref name and number of commits ahead-of or behind
+function +vi-git-st() {
+    local ahead behind remote
+    local -a gitstatus
+
+    # Are we on a remote-tracking branch?
+    remote=${$(git rev-parse --verify ${hook_com[branch]}@{upstream} \
+        --symbolic-full-name --abbrev-ref 2>/dev/null)}
+
+    if [[ -n ${remote} ]] ; then
+        ahead=$(git rev-list ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null | wc -l | sed -e 's/ *//')
+        #ahead=5
+        (( $ahead )) && gitstatus+=( "${_prompt_jespern_colors[5]}+${ahead}%f" )
+
+        behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l | sed -e 's/ *//')
+        #behind=1
+        (( $behind )) && gitstatus+=( "${_prompt_jespern_colors[4]}-${behind}%f" )
+
+        hook_com[misc]="${(j:/:)gitstatus}"
+    fi
+}
+
+function prompt_jespern_precmd {
+  # Get Git repository information.
+  if (( $+functions[git-info] )); then
+    git-info
+  fi
+
+  # Get Ruby information.
+  if (( $+functions[ruby-info] )); then
+    ruby-info
+  fi
+
+  vcs_info 'prompt'
+
+  # Get virtualenv information.
+  if (( $+functions[python-info] )); then
+    python-info
+  fi
+}
+
+function prompt_jespern_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+  autoload -Uz vcs_info
+
+  # Add hook to set up prompt parameters before each command.
+  add-zsh-hook precmd prompt_jespern_precmd
+
+  # Git magic.
+  zstyle ':vcs_info:git*+set-message:*' hooks git-st
+  zstyle ':vcs_info:*+*:*' debug false
+
+  # Set git-info parameters.
+  local branch_format="(${_prompt_jespern_colors[1]}%b %m%f %u%c %f)"
+  local rbranch_format="" # "(${_prompt_jespern_colors[1]}%b%f)"
+  local action_format="(${_prompt_jespern_colors[5]}%a%f)"
+  local unstaged_format="${_prompt_jespern_colors[1]}✱%f"
+  local staged_format="${_prompt_jespern_colors[5]}✭%f"
+
+  # Set vcs_info parameters.
+  zstyle ':vcs_info:*' enable git hg svn
+  zstyle ':vcs_info:*:prompt:*' check-for-changes true
+  zstyle ':vcs_info:*:prompt:*' unstagedstr "${unstaged_format}"
+  zstyle ':vcs_info:*:prompt:*' stagedstr "${staged_format}"
+  zstyle ':vcs_info:*:prompt:*' actionformats "${branch_format}" "${rbranch_format}${action_format}"
+  zstyle ':vcs_info:*:prompt:*' formats "${branch_format}"
+  zstyle ':vcs_info:*:prompt:*' nvcsformats   ""
+
+  # Set ruby-info parameters.
+  zstyle ':prezto:module:ruby:info:version' format '[%v]'
+
+  # Set python-info parameters.
+  zstyle ':prezto:module:python:info:virtualenv' format '(%v)'
+
+  # Define prompts.
+  PROMPT=""'${_prompt_jespern_colors[6]}${python_info[virtualenv]}'"%f${_prompt_jespern_colors[3]}%n%f@${_prompt_jespern_colors[2]}%m%f ${_prompt_jespern_colors[5]}%~%f "'${vcs_info_msg_0_}'"$ "
+  RPROMPT='${vcs_info_msg_1_}'
+}
+
+prompt_jespern_setup "$@"
