@@ -92,7 +92,7 @@ function prompt_jespern_setup {
   local rbranch_format="" # "(${_prompt_jespern_colors[1]}%b%f)"
   local action_format="(${_prompt_jespern_colors[5]}%a%f)"
   local unstaged_format="${_prompt_jespern_colors[3]}٭%f"
-  local staged_format="${_prompt_jespern_colors[5]}✭%f"
+  local staged_format="${_prompt_jespern_colors[5]}٭%f"
 
   # Set vcs_info parameters.
   zstyle ':vcs_info:*' enable git hg svn
