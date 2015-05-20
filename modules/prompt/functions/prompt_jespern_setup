@@ -47,22 +47,17 @@ function +vi-git-st() {
     if [[ -n ${remote} ]] ; then
         ahead=$(git rev-list ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null | wc -l | sed -e 's/ *//')
         #ahead=5
-        (( $ahead )) && gitstatus+=( "${_prompt_jespern_colors[5]}+${ahead}%f" )
+        (( $ahead )) && gitstatus+=( "${_prompt_jespern_colors[5]} +${ahead}%f" )
 
         behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l | sed -e 's/ *//')
         #behind=1
-        (( $behind )) && gitstatus+=( "${_prompt_jespern_colors[4]}-${behind}%f" )
+        (( $behind )) && gitstatus+=( "${_prompt_jespern_colors[4]} -${behind}%f" )
 
         hook_com[misc]="${(j:/:)gitstatus}"
     fi
 }
 
 function prompt_jespern_precmd {
-  # Get Git repository information.
-  if (( $+functions[git-info] )); then
-    git-info
-  fi
-
   # Get Ruby information.
   if (( $+functions[ruby-info] )); then
     ruby-info
@@ -93,10 +88,10 @@ function prompt_jespern_setup {
   zstyle ':vcs_info:*+*:*' debug false
 
   # Set git-info parameters.
-  local branch_format="(${_prompt_jespern_colors[1]}%b %m%f %u%c %f)"
+  local branch_format="(${_prompt_jespern_colors[1]}%b%u%c%m%f)"
   local rbranch_format="" # "(${_prompt_jespern_colors[1]}%b%f)"
   local action_format="(${_prompt_jespern_colors[5]}%a%f)"
-  local unstaged_format="${_prompt_jespern_colors[1]}✱%f"
+  local unstaged_format="${_prompt_jespern_colors[3]}٭%f"
   local staged_format="${_prompt_jespern_colors[5]}✭%f"
 
   # Set vcs_info parameters.
