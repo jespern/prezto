@@ -110,7 +110,7 @@ function prompt_jespern_setup {
   zstyle ':prezto:module:python:info:virtualenv' format '(%v)'
 
   # Define prompts.
-  PROMPT=""'${_prompt_jespern_colors[6]}${python_info[virtualenv]}'"%f${_prompt_jespern_colors[3]}%n%f@${_prompt_jespern_colors[2]}%m%f ${_prompt_jespern_colors[5]}%~%f "'${vcs_info_msg_0_}'"$ "
+  PROMPT=""'${_prompt_jespern_colors[6]}${python_info[virtualenv]}'"%f${_prompt_jespern_colors[3]}%n%f@${_prompt_jespern_colors[2]}%m%f ${_prompt_jespern_colors[5]}%~%f "'${vcs_info_msg_0_}'"%<<%(!.#.$)%b%f "
   RPROMPT='${vcs_info_msg_1_}'
 }
 
